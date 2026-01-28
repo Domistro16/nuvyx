@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-accent: var(--accent);
+
+  --color-surface-100: var(--surface-100);
+  --color-surface-200: var(--surface-200);
+  --color-surface-300: var(--surface-300);
+  --color-surface-400: var(--surface-400);
+
+  --color-dark-100: var(--dark-100);
+  --color-dark-200: var(--dark-200);
+  --color-dark-300: var(--dark-300);
+  --color-dark-400: var(--dark-400);
+
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-scale-in: scale-in 0.3s ease-out;
+  --animate-spin-slow: spin 3s linear infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --accent: #d946ef;
+
+  /* Light mode/Surface variations */
+  --surface-100: #ffffff;
+  --surface-200: #f1f5f9;
+  --surface-300: #e2e8f0;
+  --surface-400: #cbd5e1;
+
+  /* Dark mode palette - Premium Navy/Slate */
+  --dark-100: #020617;
+  /* Void */
+  --dark-200: #070c1d;
+  /* Deep Navy */
+  --dark-300: #101935;
+  /* Navy Blue */
+  --dark-400: #1e294b;
+  /* Slate Blue Border */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: var(--dark-100);
+    --foreground: #f8fafc;
+    --surface-100: var(--dark-200);
+    --surface-200: var(--dark-300);
+    --surface-300: var(--dark-400);
+    --surface-400: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.dark {
+  color-scheme: dark;
+  --background: var(--dark-100);
+  --foreground: #f1f5f9;
+  --surface-100: var(--dark-200);
+  --surface-200: var(--dark-300);
+  --surface-300: var(--dark-400);
+  --surface-400: rgba(255, 255, 255, 0.1);
+}
+
+.light {
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --surface-100: #ffffff;
+  --surface-200: #f1f5f9;
+  --surface-300: #e2e8f0;
+  --surface-400: #cbd5e1;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+}
+
+/* Utility: Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Premium Glass Utilities - Theme Aware */
+.glass-panel {
+  background: color-mix(in srgb, var(--surface-100), transparent 20%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in srgb, var(--surface-300), transparent 50%);
+}
+
+.dark .glass-panel {
+  background: rgba(16, 25, 53, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.input-glass {
+  background: color-mix(in srgb, var(--surface-200), transparent 40%);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--surface-300);
+}
+
+.glow-primary {
+  box-shadow: 0 0 20px -5px rgba(99, 102, 241, 0.3);
+}
+
+.dark .glow-primary:hover {
+  box-shadow: 0 0 25px -2px rgba(99, 102, 241, 0.5);
+}

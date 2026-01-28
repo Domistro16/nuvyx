@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  privyDid      String?   @unique @map("privy_did")
+  walletAddress String    @unique @map("wallet_address") @db.VarChar(64)
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  streams       Stream[]
+  library       Library[]
+  likes         LikedSong[]
+  downloads     Download[]
+  playlists     Playlist[]
+
+  @@map("users")
+}
+
+model Song {
+  id          String    @id @default(uuid()) @db.Uuid
+  title       String
+  artist      String    @default("nuvyxm")
+  moodType    String    @map("mood_type")
+  duration    String?   @default("0:00")
+  tags        String[]  @default([])
+  r2ObjectKey String    @unique @map("r2_object_key")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  streams       Stream[]
+  library       Library[]
+  likes         LikedSong[]
+  downloads     Download[]
+  playlistItems PlaylistSong[]
+
+  @@map("songs")
+}
+
+model Stream {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  songId     String?  @map("song_id") @db.Uuid
+  streamedAt DateTime @default(now()) @map("streamed_at")
+
+  user User? @relation(fields: [userId], references: [id])
+  song Song? @relation(fields: [songId], references: [id])
+
+  @@map("streams")
+}
+
+model Library {
+  userId  String   @map("user_id") @db.Uuid
+  songId  String   @map("song_id") @db.Uuid
+  addedAt DateTime @default(now()) @map("added_at")
+
+  user User @relation(fields: [userId], references: [id])
+  song Song @relation(fields: [songId], references: [id])
+
+  @@id([userId, songId])
+  @@map("library")
+}
+
+model LikedSong {
+  userId  String   @map("user_id") @db.Uuid
+  songId  String   @map("song_id") @db.Uuid
+  likedAt DateTime @default(now()) @map("liked_at")
+
+  user User @relation(fields: [userId], references: [id])
+  song Song @relation(fields: [songId], references: [id])
+
+  @@id([userId, songId])
+  @@map("liked_songs")
+}
+
+model Download {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String?  @map("user_id") @db.Uuid
+  songId       String?  @map("song_id") @db.Uuid
+  downloadedAt DateTime @default(now()) @map("downloaded_at")
+
+  user User? @relation(fields: [userId], references: [id])
+  song Song? @relation(fields: [songId], references: [id])
+
+  @@map("downloads")
+}
+
+model Playlist {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User?          @relation(fields: [userId], references: [id])
+  items PlaylistSong[]
+
+  @@map("playlists")
+}
+
+model PlaylistSong {
+  playlistId String   @map("playlist_id") @db.Uuid
+  songId     String   @map("song_id") @db.Uuid
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  playlist Playlist @relation(fields: [playlistId], references: [id])
+  song     Song     @relation(fields: [songId], references: [id])
+
+  @@id([playlistId, songId])
+  @@map("playlist_songs")
+}
+
