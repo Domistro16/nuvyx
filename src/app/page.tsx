@@ -10,8 +10,9 @@ import { usePlayer, Song } from "@/providers/player-provider";
 
 // Category definitions for the rotating carousel
 const CATEGORIES = [
-  { id: 'trending', label: 'Trending Tracks', icon: TrendingUp, filter: null },
-  { id: 'latest', label: 'Latest Tracks', icon: Clock, filter: null },
+  { id: 'all', label: 'All Tracks', icon: Music, filter: 'all' },
+  { id: 'trending', label: 'Trending Tracks', icon: TrendingUp, filter: 'trending' },
+  { id: 'latest', label: 'Latest Tracks', icon: Clock, filter: 'latest' },
   ...MOOD_PRESETS.map(m => ({
     id: m.filter,
     label: `Top ${m.label} Tracks`,
@@ -33,7 +34,6 @@ export default function Home() {
 
   // Fetch all songs and trending songs on mount
   useEffect(() => {
-    document.title = "Home | NUVYX";
     const fetchData = async () => {
       try {
         // Fetch trending songs
@@ -67,26 +67,7 @@ export default function Home() {
     fetchData();
   }, []);
 
-  // Auto-rotate categories every 5 seconds (only when no manual filter)
-  useEffect(() => {
-    if (manualFilter !== null || isPaused) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
-
-    intervalRef.current = setInterval(() => {
-      setCategoryIndex(prev => (prev + 1) % CATEGORIES.length);
-    }, 5000);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [manualFilter, isPaused]);
+  // Auto-rotate removed as per user request
 
   // Get current category
   const currentCategory = manualFilter !== null
@@ -95,11 +76,14 @@ export default function Home() {
 
   // Get tracks for current category
   const getDisplayTracks = useCallback(() => {
+    if (currentCategory.id === 'all') {
+      return allSongs;
+    }
     if (currentCategory.id === 'trending') {
       return trendingSongs.length > 0 ? trendingSongs : allSongs.slice(0, 10);
     }
     if (currentCategory.id === 'latest') {
-      return allSongs.slice(0, 10);
+      return [...allSongs].reverse().slice(0, 10);
     }
     // Filter by mood
     return allSongs.filter(s => s.moodType === currentCategory.filter).slice(0, 10);
@@ -186,9 +170,27 @@ export default function Home() {
             </Card>
           ))}
         </div>
+
+        <div className="flex flex-wrap gap-4 mt-8">
+          {[
+            { id: 'all', label: 'All Tracks', icon: Music, color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
+            { id: 'trending', label: 'Trending', icon: TrendingUp, color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400' },
+            { id: 'latest', label: 'Latest', icon: Clock, color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' },
+          ].map(btn => (
+            <Button
+              key={btn.id}
+              variant="secondary"
+              onClick={() => handleFilterClick(btn.id)}
+              className={`h-14 px-8 rounded-2xl border-white/10 dark:bg-white/5 hover:bg-primary/10 hover:border-primary/50 transition-all gap-3 text-lg font-bold ${manualFilter === btn.id ? 'ring-2 ring-primary border-primary bg-primary/10' : ''}`}
+            >
+              <btn.icon className={`w-5 h-5 ${manualFilter === btn.id ? 'text-primary' : 'text-slate-400'}`} />
+              <span className={manualFilter === btn.id ? 'text-primary' : 'dark:text-white'}>{btn.label}</span>
+            </Button>
+          ))}
+        </div>
       </section>
 
-      <section className="grid lg:grid-cols-3 gap-8">
+      <section className="grid lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div
@@ -207,9 +209,13 @@ export default function Home() {
               )}
             </div>
             {manualFilter !== null && (
-              <button onClick={() => setManualFilter(null)} className="text-sm text-slate-500 hover:text-primary">
-                Clear Filter
-              </button>
+              <Button
+                variant="ghost"
+                onClick={() => setManualFilter(null)}
+                className="text-xs text-slate-500 hover:text-primary hover:bg-primary/10 px-3 py-1"
+              >
+                Reset Default
+              </Button>
             )}
           </div>
 
@@ -230,7 +236,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="glass-panel rounded-3xl p-2 space-y-1 min-h-[200px] shadow-xl">
+          <div className="glass-panel rounded-3xl p-2 space-y-1 max-h-[800px] overflow-y-auto shadow-xl scrollbar-hide h-auto">
             {loading ? (
               <div className="p-8 text-center text-slate-500">Loading...</div>
             ) : displayTracks.length > 0 ? (
@@ -261,10 +267,10 @@ export default function Home() {
           </div>
         </div>
         <div className="space-y-6">
-          <Card className="bg-black border-none text-white relative overflow-hidden h-full min-h-[300px] flex flex-col justify-end group cursor-pointer shadow-2xl">
+          <Card className="bg-black border-none text-white relative overflow-hidden h-[400px] flex flex-col justify-end group cursor-pointer shadow-2xl">
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10"></div>
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1614728263952-84ea256f9679?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-60 group-hover:scale-105 transition duration-1000"></div>
-            <div className="relative z-20">
+            <div className="relative z-20 p-6">
               <div className="flex items-center gap-2 mb-3"><span className="bg-red-600/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider animate-pulse">Featured Simulation</span></div>
               <h3 className="text-2xl font-black mb-2 leading-tight">Liquidity Pool Serenade</h3>
               <p className="text-slate-300 text-sm mb-6 font-medium">Watch the generative AI visualizer.</p>

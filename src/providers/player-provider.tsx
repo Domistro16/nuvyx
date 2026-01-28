@@ -65,6 +65,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
+    useEffect(() => {
+        if (currentSong && isPlaying) {
+            document.title = `${currentSong.title} - ${currentSong.artist} | NUVYX`;
+        } else {
+            document.title = 'NUVYX | Soundtrack for Every Moment';
+        }
+    }, [currentSong, isPlaying]);
+
     // Fetch library on auth
     useEffect(() => {
         const fetchLibrary = async () => {
@@ -90,7 +98,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }, [authenticated, getAccessToken]);
 
     const addToLibrary = useCallback(async (songId: string) => {
-        if (!authenticated) return;
+        if (!authenticated) {
+            login();
+            return;
+        }
         try {
             const token = await getAccessToken();
             const res = await fetch('/api/library', {
@@ -110,7 +121,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }, [authenticated, getAccessToken]);
 
     const removeFromLibrary = useCallback(async (songId: string) => {
-        if (!authenticated) return;
+        if (!authenticated) {
+            login();
+            return;
+        }
         try {
             const token = await getAccessToken();
             const res = await fetch('/api/library', {
@@ -225,12 +239,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setCurrentSong(song);
 
         try {
-            const token = await getAccessToken();
+            const token = authenticated ? await getAccessToken() : null;
             // Fetch presigned URL from our API
             const res = await fetch(`/api/stream?key=${encodeURIComponent(song.r2ObjectKey)}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
             });
             if (!res.ok) {
                 throw new Error('Failed to get stream URL');
@@ -241,21 +253,21 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             await audioRef.current.play();
             setIsPlaying(true);
 
-            // Log stream to backend (fire and forget)
-            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            // Log stream to backend (fire and forget) if authenticated
             if (authenticated) {
+                const headers: Record<string, string> = { 'Content-Type': 'application/json' };
                 try {
                     const token = await getAccessToken();
                     headers['Authorization'] = `Bearer ${token}`;
+                    fetch('/api/interactions', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({ type: 'stream', songId: song.id })
+                    }).catch(console.error);
                 } catch (e) {
                     console.error("Failed to get token for interaction", e);
                 }
             }
-            fetch('/api/interactions', {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ type: 'stream', songId: song.id })
-            }).catch(console.error);
 
         } catch (err) {
             console.error("Playback failed", err);
@@ -318,11 +330,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     const playSong = useCallback(async (song: Song) => {
         if (!audioRef.current) return;
-
-        if (!authenticated) {
-            login();
-            return;
-        }
 
         // If same song, toggle play/pause
         if (currentSong?.id === song.id) {

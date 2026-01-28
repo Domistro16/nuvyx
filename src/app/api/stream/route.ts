@@ -5,12 +5,14 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const isDownload = searchParams.get("download") === "true";
+
     const claims = await verifyAuth(request);
-    if (!claims) {
+    if (isDownload && !claims) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
     const key = searchParams.get("key");
 
     if (!key) {
