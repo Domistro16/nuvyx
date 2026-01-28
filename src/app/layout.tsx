@@ -20,6 +20,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <title>NUVYX | The Sound of the Blockchain</title>
+        <meta name="description" content="NUVYX is a premium decentralized audio platform for discoverable vibes and on-chain music." />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#020617" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

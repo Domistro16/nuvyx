@@ -33,6 +33,7 @@ export default function Home() {
 
   // Fetch all songs and trending songs on mount
   useEffect(() => {
+    document.title = "Home | NUVYX";
     const fetchData = async () => {
       try {
         // Fetch trending songs

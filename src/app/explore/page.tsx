@@ -31,6 +31,7 @@ export default function Explore() {
         : COLLECTIONS.filter(c => c.category === exploreCategory);
 
     useEffect(() => {
+        document.title = "Explore | NUVYX";
         const fetchTopMints = async () => {
             try {
                 const res = await fetch('/api/ranking/top-mints');

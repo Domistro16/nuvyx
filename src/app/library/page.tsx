@@ -27,6 +27,7 @@ export default function Library() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        document.title = "My Library | NUVYX";
         const fetchContent = async () => {
             if (!ready || !authenticated) {
                 setLoading(false);

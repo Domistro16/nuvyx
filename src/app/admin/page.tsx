@@ -42,6 +42,7 @@ export default function AdminDashboard() {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
+        document.title = "Admin Dashboard | NUVYX";
         const fetchSongs = async () => {
             try {
                 const res = await fetch('/api/songs');
