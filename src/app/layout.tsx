@@ -22,6 +22,7 @@ export default function RootLayout({
       <head>
         <title>NUVYX | The Sound of the Blockchain</title>
         <meta name="description" content="NUVYX is a premium decentralized audio platform for discoverable vibes and on-chain music." />
+        <link rel="icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#020617" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -42,9 +43,11 @@ export default function RootLayout({
                       <button onClick={() => setSidebarOpen(true)}>
                         <Menu />
                       </button>
-                      <span className="font-bold text-lg dark:text-white">NUVYX</span>
+                      <div className="flex items-center gap-2">
+                        <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg object-cover" />
+                        <span className="font-bold text-lg dark:text-white">NUVYX</span>
+                      </div>
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-primary/20"></div>
                   </header>
 
                   <div className="max-w-7xl mx-auto px-4 py-8 lg:px-12 lg:py-16">
