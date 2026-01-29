@@ -73,7 +73,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 <div className="h-full flex flex-col p-6">
                     <div className="flex items-center justify-between mb-10">
                         <Link href="/" className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-lg">
+                            <div className="w-14 h-14 rounded-xl overflow-hidden flex items-center justify-center shadow-lg bg-black">
                                 <img src="/logo.png" alt="NUVYX Logo" className="w-full h-full object-cover" />
                             </div>
                             <span className="text-2xl font-black tracking-tight dark:text-white">
